@@ -24,14 +24,14 @@ if uploaded_file is not None:
     mask = np.zeros_like(edited_img, dtype=np.uint8)
 
     # Function to remove object from image
-    def remove_object():
-        nonlocal edited_img, mask
-        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
+    def remove_object(edited_img, mask):
+        mask_gray = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(mask_gray, 1, 255, cv2.THRESH_BINARY)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for contour in contours:
             x, y, w, h = cv2.boundingRect(contour)
             edited_img[y:y + h, x:x + w] = cv2.inpaint(edited_img, contour, 5, cv2.INPAINT_TELEA)
+        return edited_img
 
     # Create a slider to adjust brush size
     brush_size = st.slider("Brush Size", min_value=1, max_value=50, step=1, value=10)
@@ -62,18 +62,22 @@ if uploaded_file is not None:
             cv2.circle(mask, (x, y), brush_size, color_bgr, -1)
 
             # Update the edited image with the object removal
-            remove_object()
+            edited_img = remove_object(edited_img, mask)
 
         # Display the updated edited image
         st.image(edited_img, channels="BGR", use_column_width=True)
 
         # Wait for a short duration to control the loop speed
-        st.report_thread.get_report_ctx().enqueue(time.sleep, 0.01)
+        st.report_thread.get_report_ctx().enqueue(time.sleep, 0.01
+        # Wait for a short duration to control the loop speed
+        time.sleep(0.01)
 
-    # Clear the mask and edited image when object removal is turned off
-    mask.fill(0)
-    edited_img = np.copy(img)
+        # Check if the remove object checkbox is unchecked
+        if not remove_object_checkbox:
+            # Reset the mask and update the edited image
+            mask = np.zeros_like(edited_img, dtype=np.uint8)
+            edited_img = np.copy(img)
 
-# Close the Streamlit app
-st.button("Close")
-
+    # Display the final edited image
+    st.subheader("Final Edited Image")
+    st.image(edited_img, channels="BGR", use_column_width=True)
