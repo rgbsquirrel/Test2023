@@ -76,21 +76,13 @@ if uploaded_file is not None:
             # Reset the mask
             mask = np.zeros_like(edited_img, dtype=np.uint8
 # Check if the remove object checkbox is unchecked
+# Check if the remove object checkbox is unchecked
 if not remove_object_checkbox:
     # Reset the mask
     mask = np.zeros_like(edited_img, dtype=np.uint8)
 
     # Clear the canvas
     st.canvas_clear()
-
-# Display the final edited image after object removal
-st.subheader("Final Edited Image")
-st.image(edited_img, channels="BGR", use_column_width=True)
-
-# Display the final edited image after object removal
-st.subheader("Final Edited Image")
-st.image(edited_img, channels="BGR", use_column_width=True)
-
 
 # Display the final edited image after object removal
 st.subheader("Final Edited Image")
