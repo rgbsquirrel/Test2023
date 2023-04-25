@@ -54,7 +54,7 @@ if uploaded_file is not None:
     # Main loop for object removal
     while remove_object_checkbox:
         # Get mouse event and coordinates
-        event = st.report_thread.get_report_ctx().enqueue(None, st.get_last_mouse_event, key="canvas")
+        event = st.get_last_mouse_event()
         x, y = int(event["x"]), int(event["y"])
 
         # Check if the mouse is within the image bounds
@@ -69,16 +69,20 @@ if uploaded_file is not None:
         st.image(edited_img, channels="BGR", use_column_width=True)
 
         # Wait for a short duration to control the loop speed
-        st.report_thread.get_report_ctx().enqueue(time.sleep, 0.01
-        # Wait for a short duration to control the loop speed
         time.sleep(0.01)
 
         # Check if the remove object checkbox is unchecked
         if not remove_object_checkbox:
-            # Reset the mask and update the edited image
-            mask = np.zeros_like(edited_img, dtype=np.uint8)
-            edited_img = np.copy(img)
+            # Reset the mask
+            mask = np.zeros_like(edited_img, dtype=np.uint8
+# Check if the remove object checkbox is unchecked
+if not remove_object_checkbox:
+    # Reset the mask
+    mask = np.zeros_like(edited_img, dtype=np.uint8)
 
-    # Display the final edited image
-    st.subheader("Final Edited Image")
-    st.image(edited_img, channels="BGR", use_column_width=True)
+    # Clear the canvas
+    st.canvas_clear()
+
+# Display the final edited image after object removal
+st.subheader("Final Edited Image")
+st.image(edited_img, channels="BGR", use_column_width=True)
