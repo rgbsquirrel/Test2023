@@ -1,48 +1,34 @@
 import streamlit as st
+from PIL import Image
 import cv2
-import numpy as np
 
-# Load the image
+# Set page title
+st.title("Image Filter App")
+
+# Upload image file
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+
 if uploaded_file is not None:
-    img = cv2.imdecode(np.fromstring(uploaded_file.read(), np.uint8), cv2.IMREAD_COLOR)
-    edited_img = np.copy(img)
-    mask = np.zeros_like(edited_img, dtype=np.uint8)
+    # Convert uploaded file to PIL.Image
+    img = Image.open(uploaded_file)
 
-    # Display the original image
-    st.subheader("Original Image")
-    st.image(img, channels="BGR", use_column_width=True)
+    # Display original image
+    st.image(img, caption="Original Image")
 
-    # Display the edited image
-    st.subheader("Edited Image")
-    edited_img = cv2.cvtColor(edited_img, cv2.COLOR_BGR2RGB)
-    edited_img = cv2.addWeighted(edited_img, 1, mask, 0.7, 0)
-    st.image(edited_img, channels="RGB", use_column_width=True)
+    # Apply grayscale filter
+    if st.button("Grayscale"):
+        gray_img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2GRAY)
+        st.image(gray_img, caption="Grayscale Image")
 
-    # Remove object checkbox
-    remove_object_checkbox = st.checkbox("Remove Object")
+    # Apply blur filter
+    if st.button("Blur"):
+        ksize = st.slider("Kernel size", 1, 31, 5)
+        blur_img = cv2.GaussianBlur(np.array(img), (ksize, ksize), 0)
+        st.image(blur_img, caption="Blurred Image")
 
-    if remove_object_checkbox:
-        # Add instructions for object removal
-        st.info("Click and drag on the image to mark the object to be removed.")
-
-        # Create a canvas for user to mark the object
-        canvas_result = st_canvas(
-            255 * mask[:, :, 0],
-            height=img.shape[0],
-            width=img.shape[1],
-            drawing_mode="freedraw",
-            key="canvas",
-        )
-
-        # Get the updated mask
-        mask = canvas_result.image_data.astype(np.uint8)[:, :, 0]
-
-        # Apply the mask to the edited image
-        edited_img = cv2.cvtColor(edited_img, cv2.COLOR_RGB2BGR)
-        edited_img = cv2.addWeighted(edited_img, 1, mask, 0.7, 0)
-        edited_img = cv2.cvtColor(edited_img, cv2.COLOR_BGR2RGB)
-
-    # Display the final edited image after object removal
-    st.subheader("Final Edited Image")
-    st.image(edited_img, channels="RGB", use_column_width=True)
+    # Apply edge detection filter
+    if st.button("Edge Detection"):
+        edges = cv2.Canny(np.array(img), 100, 200)
+        st.image(edges, caption="Edge Detected Image")
+else:
+    st.warning("Please upload an image file.")
