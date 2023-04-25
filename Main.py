@@ -76,7 +76,6 @@ if uploaded_file is not None:
             # Reset the mask
             mask = np.zeros_like(edited_img, dtype=np.uint8
 # Check if the remove object checkbox is unchecked
-# Check if the remove object checkbox is unchecked
 if not remove_object_checkbox:
     # Reset the mask
     mask = np.zeros_like(edited_img, dtype=np.uint8)
